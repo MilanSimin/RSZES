@@ -187,8 +187,8 @@ void colour_rect(int colour, int *img, int x1, int x2, int y1, int y2)
 int main(int argc, char *argv[])
 {
 	FILE *infile; 
-	char *line_buff; 
-	size_t line_buff_size = 0; 
+	char *my_line; 
+	size_t my_line_bytes; 
 
 	if (argc < 2) {
 		cout << "Please enter config file path\n";
@@ -209,23 +209,27 @@ int main(int argc, char *argv[])
 	fd = open("/dev/vga_dma", O_RDWR | O_NDELAY);
 	if (fd < 0)
 	{
-		cout << "Cannot open /dev/vga_dma" << "\n";
-		exit(EXIT_FAILURE);
+		cout << "Cannot open /dev/vga_dma for write \n";
+		return -1;
 	}
 	else
-		buffer = (int *)mmap(0, MAX_PKT_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+		image = (int *)mmap(0, MAX_PKT_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-	while(getline(&line_buff, &line_buff_size, infile) >= 0)
+
+
+
+	while( getline(&my_line , &my_line_bytes, infile) >= 0 )
 	{
-		regex_line(line_buff, image);
+		regex_line(my_line, image);
 	}
 
 	fclose(infile); //Zatvaranje text fajla
 	munmap(image, MAX_MMAP_SIZE);
 	close(fd);
-	if (fd < 0)
-		cout << "Cannot close " << "/dev/vga_dma" << "\n";
-
+	if (fd < 0){
+		cout << "Cannot close /dev/vga_dma \n";
+		return -1;
+	}
 	delete [] image;
 
 }
