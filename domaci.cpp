@@ -60,7 +60,7 @@ unsigned int get_colour(string colour_s)
 
 
 
-
+//regex funkcija za pronalazenje kljucnih reci i komandi
 void regex_line (string line, int *image)
 {
 
@@ -88,8 +88,8 @@ void regex_line (string line, int *image)
 
 			if(regex_search(line, find_match, vertical_line)){
 
-			cout<<"LINE_V je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<endl;
-		colour_vertical(get_colour(find_match[4]), image, stoi find_match[1], stoi find_match[2], stoi find_match[3]);
+	cout<<"LINE_V je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<endl;
+	colour_vertical(get_colour(find_match[4]), image, stoi (find_match[1]), stoi (find_match[2]), stoi (find_match[3]));
 			
 			
 			}
@@ -102,8 +102,8 @@ void regex_line (string line, int *image)
 
 			if(regex_search(line, find_match, horizontal_line)){
 
-			cout<<"LINE_H je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<endl;
-		colour_horizontal(get_colour(find_match[4]), image, stoi find_match[1], stoi find_match[2], stoi find_match[3]);
+	cout<<"LINE_H je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<endl;
+	colour_horizontal(get_colour(find_match[4]), image, stoi (find_match[1]), stoi (find_match[2]), stoi (find_match[3]));
 			
 			
 			}
@@ -118,7 +118,7 @@ void regex_line (string line, int *image)
 			if(regex_search(line, find_match, rectangle)){
 
 cout<<"RECT je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<" "<<find_match[5]<<endl;
-colour_rect(get_colour(find_match[5]), image, stoi find_match[1], stoi find_match[2], stoi find_match[3], stoi find_match[4]);
+colour_rect(get_colour(find_match[5]), image, stoi (find_match[1]), stoi (find_match[2]), stoi (find_match[3]), stoi (find_match[4]));
 			
 			
 			}
@@ -137,7 +137,7 @@ colour_rect(get_colour(find_match[5]), image, stoi find_match[1], stoi find_matc
 	}
 
 }
-
+//funkcija za bojenje pozadine
 void colour_bckg(int colour, int *img)
 {
 	for(x=0; x<DISPLAY_X; x++){
@@ -149,7 +149,7 @@ void colour_bckg(int colour, int *img)
 	}
 
 }
-
+//funkcija za bojenje vertikalne linije
 void colour_vertical(int colour, int *img, int x, int y1, int y2)
 {
 	
@@ -159,7 +159,7 @@ void colour_vertical(int colour, int *img, int x, int y1, int y2)
 		}
 
 }
-
+//funkcija za bojenje horizontalne linije
 void colour_horizontal(int colour, int *img, int y, int x1, int x2)
 {
 	
@@ -170,7 +170,7 @@ void colour_horizontal(int colour, int *img, int y, int x1, int x2)
 
 }
 
-
+//funkcija za bojenje kvadrata
 void colour_rect(int colour, int *img, int x1, int x2, int y1, int y2)
 {
 	for(x=x1; x<x2; x++){
