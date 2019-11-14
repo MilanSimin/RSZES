@@ -16,8 +16,6 @@
 #define MAX_PKT_SIZE (640*480*4)
 
 
-
-
 #define BLUE 0x001F
 #define GREEN 0x07E0
 #define RED 0xF800
@@ -30,21 +28,8 @@ using namespace std;
 //funkcija za dobijanje boja
 unsigned int get_colour(string colour_s)
 {
-	/*string black ="BLACK";
-	string red ="RED";
-	string green ="GREEN";
-	string blue ="BLUE";
-	string yellow ="YELLOW";*/	
-	
-	/*unsigned int black_colour = 0;
-	unsigned int red_colour   = (1<<15) | (1<<14) | (1<<13) | (1<<12) | (1<<11);
-	unsigned int green_colour = (1<<10) | (1<<9)  | (1<<8)  | (1<<7)  | (1<<6)  | (1<<5);
-	unsigned int blue_colour  = (1<<4)  | (1<3)   | (1<<2)  | (1<<1)  | (1<<0);
-	unsigned int yellow_colour = red_colour | green_colour; 
-
-	cout << "colour = " << colour_s << endl;*/
  
-	if (colour_s="BLACK")
+	if (colour_s=="BLACK")
 		return BLACK;
 
 	else if (colour_s=="RED")
@@ -65,37 +50,85 @@ unsigned int get_colour(string colour_s)
 
 
 
+
+
+//funkcija za bojenje pozadine
+void colour_bckg(int colour, int *img)
+{
+	for(int x=0; x<DISPLAY_X; x++){
+
+		for(int y=0; y<DISPLAY_Y; y++){
+		
+			img[x*DISPLAY_Y +y]= colour;
+		}
+	}
+
+}
+//funkcija za bojenje vertikalne linije
+void colour_vertical(int colour, int *img, int x, int y1, int y2)
+{
+	
+		for(int y=y1; y<y2; y++){
+		
+			img[x*DISPLAY_Y +y]= colour;
+		}
+
+}
+//funkcija za bojenje horizontalne linije
+void colour_horizontal(int colour, int *img, int y, int x1, int x2)
+{
+	
+		for(int x=x1; x<x2; x++){
+		
+			img[x*DISPLAY_Y +y]= colour;
+		}
+
+}
+
+//funkcija za bojenje kvadrata
+void colour_rect(int colour, int *img, int x1, int x2, int y1, int y2)
+{
+	for(int x=x1; x<x2; x++){
+
+		for(int y=y1; y<y2; y++){
+		
+			img[x*DISPLAY_Y +y]= colour;
+		}
+	}
+
+}
+
 //regex funkcija za pronalazenje kljucnih reci i komandi
 void regex_line (string line, int *image)
 {
 
-	/*regex find_cmd (" (BCKG | LINE_V | LINE_H | RECT): ");
+	regex find_cmd ("(BCKG|LINE_V|LINE_H|RECT): ");
 	smatch find_match;
 
 	if(regex_search (line, find_match ,find_cmd)){
 
 		if (find_match[1]=="BCKG"){
 
-			regex find_colour ("(BLACK | RED | GREEN | BLUE | YELLOW)");
+			regex find_colour ("(BLACK|RED|GREEN|BLUE|YELLOW)");
 
 			if(regex_search(line,find_match,find_colour)){
 
 				cout<<"Colour: "<<find_match[1]<<endl;
 				colour_bckg(get_colour(find_match[1]), image);
-			
+				
 			}
 
 		}
 		
 		if(find_match[1]== "LINE_V"){
 			
-			regex vertical_line("(\\d+), (\\d+), (\\d+);(BLACK | RED | GREEN | BLUE | YELLOW) ");
+			regex vertical_line("(\\d+), (\\d+), (\\d+); (BLACK|RED|GREEN|BLUE|YELLOW)");
 			//regex vertical_line("([0-9]+), ([0-9]+), ([0-9]+);(BLACK | RED | GREEN | BLUE | YELLOW) ");
 
 			if(regex_search(line, find_match, vertical_line)){
 
 	cout<<"LINE_V je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<endl;
-	colour_vertical(get_colour(find_match[4]), image, stoi (find_match[1]), stoi (find_match[2]), stoi (find_match[3]));
+	colour_vertical(get_colour(find_match[4]), image, stoi(find_match[1]), stoi(find_match[2]), stoi(find_match[3]));
 			
 			
 			}
@@ -104,12 +137,12 @@ void regex_line (string line, int *image)
 
 		if(find_match[1]== "LINE_H"){
 			
-			regex horizontal_line("(\\d+), (\\d+), (\\d+);(BLACK | RED | GREEN | BLUE | YELLOW) ");
+			regex horizontal_line("(\\d+), (\\d+), (\\d+); (BLACK|RED|GREEN|BLUE|YELLOW)");
 
 			if(regex_search(line, find_match, horizontal_line)){
 
 	cout<<"LINE_H je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<endl;
-	colour_horizontal(get_colour(find_match[4]), image, stoi (find_match[1]), stoi (find_match[2]), stoi (find_match[3]));
+	colour_horizontal(get_colour(find_match[4]), image, stoi(find_match[1]), stoi(find_match[2]), stoi(find_match[3]));
 			
 			
 			}
@@ -119,12 +152,12 @@ void regex_line (string line, int *image)
 
 		if(find_match[1]== "RECT"){
 			
-			regex rectangle("(\\d+), (\\d+), (\\d+), (\\d+) ;(BLACK | RED | GREEN | BLUE | YELLOW) ");
+			regex rectangle("(\\d+), (\\d+), (\\d+), (\\d+); (BLACK|RED|GREEN|BLUE|YELLOW)");
 
 			if(regex_search(line, find_match, rectangle)){
 
 cout<<"RECT je: "<<find_match[1]<<" "<<find_match[2]<<" "<<find_match[3]<<" "<<find_match[4]<<" "<<find_match[5]<<endl;
-colour_rect(get_colour(find_match[5]), image, stoi (find_match[1]), stoi (find_match[2]), stoi (find_match[3]), stoi (find_match[4]));
+colour_rect(get_colour(find_match[5]), image, stoi(find_match[1]), stoi(find_match[2]), stoi(find_match[3]), stoi(find_match[4]));
 			
 			
 			}
@@ -141,56 +174,8 @@ colour_rect(get_colour(find_match[5]), image, stoi (find_match[1]), stoi (find_m
 		cout<<"ERROR, no matches found "<<endl;
 	
 	}
-*/
-}
-
-
-//funkcija za bojenje pozadine
-void colour_bckg(int colour, int *img)
-{
-	/*for(x=0; x<DISPLAY_X; x++){
-
-		for(y=0; y<DISPLAY_Y; y++){
-		
-			img[x*DISPLAY_Y +y]= colour;
-		}
-	}*/
 
 }
-//funkcija za bojenje vertikalne linije
-void colour_vertical(int colour, int *img, int x, int y1, int y2)
-{
-	/*
-		for(y=y1; y<y2; y++){
-		
-			img[x*DISPLAY_Y +y]= colour;
-		}
-*/
-}
-//funkcija za bojenje horizontalne linije
-void colour_horizontal(int colour, int *img, int y, int x1, int x2)
-{
-	/*
-		for(x=x1; x<x2; x++){
-		
-			img[x*DISPLAY_Y +y]= colour;
-		}
-*/
-}
-
-//funkcija za bojenje kvadrata
-void colour_rect(int colour, int *img, int x1, int x2, int y1, int y2)
-{
-	/*for(x=x1; x<x2; x++){
-
-		for(y=y1; y<y2; y++){
-		
-			img[x*DISPLAY_Y +y]= colour;
-		}
-	}
-*/
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -214,8 +199,8 @@ int main(int argc, char *argv[])
 	int *image;
 	int fd;
 	char *my_line;
-	size_t my_line_bytes;	
-
+	int  my_line_bytes= 150;	
+	my_line= (char *) malloc (my_line_bytes+1);
 
 	fd = open("/dev/vga_dma", O_RDWR | O_NDELAY);
 	if (fd < 0)
