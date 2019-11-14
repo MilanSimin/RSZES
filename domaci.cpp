@@ -1,16 +1,14 @@
 #include <stdlib.h>
+#include <cstdlib>
 #include <stdio.h>
 #include <string>
 #include <regex>
 #include <iostream>
 #include <fcntl.h>
-#include <cstdlib>
 #include <unistd.h>
 #include <sys/mman.h>
 
 #include <iostream>
-#include <fstream>
-#include <stdlib.h>
 //sve potrebne biblioteke za rad
 
 #define DISPLAY_X 640 
@@ -18,12 +16,13 @@
 #define MAX_PKT_SIZE (640*480*4)
 
 
-string black ="BLACK";
-string red ="RED";
-string green ="GREEN";
-string blue ="BLUE";
-string yellow ="YELLOW";
 
+
+#define BLUE 0x001F
+#define GREEN 0x07E0
+#define RED 0xF800
+#define BLACK 0x0000
+#define YELLOW (RED + GREEN)
 
 using namespace std;
 
@@ -31,28 +30,34 @@ using namespace std;
 //funkcija za dobijanje boja
 unsigned int get_colour(string colour_s)
 {
-	unsigned int black_colour = 0;
+	/*string black ="BLACK";
+	string red ="RED";
+	string green ="GREEN";
+	string blue ="BLUE";
+	string yellow ="YELLOW";*/	
+	
+	/*unsigned int black_colour = 0;
 	unsigned int red_colour   = (1<<15) | (1<<14) | (1<<13) | (1<<12) | (1<<11);
 	unsigned int green_colour = (1<<10) | (1<<9)  | (1<<8)  | (1<<7)  | (1<<6)  | (1<<5);
 	unsigned int blue_colour  = (1<<4)  | (1<3)   | (1<<2)  | (1<<1)  | (1<<0);
 	unsigned int yellow_colour = red_colour | green_colour; 
 
-	cout << "colour = " << colour_s << endl;
+	cout << "colour = " << colour_s << endl;*/
+ 
+	if (colour_s="BLACK")
+		return BLACK;
 
-	if (colour_s==black)
-		return black_colour;
+	else if (colour_s=="RED")
+		return RED;
 
-	else if (colour_s==red)
-		return red_colour;
+	else if (colour_s=="GREEN")
+		return GREEN;
 
-	else if (colour_s==green)
-		return green_colour;
+	else if (colour_s=="BLUE")
+		return BLUE;
 
-	else if (colour_s==blue)
-		return blue_colour;
-
-	else if (colour_s==yellow)
-		return yellow_colour;
+	else if (colour_s=="YELLOW")
+		return YELLOW;
 
 	cout<<"colour invalid. "<<endl;
 	exit(3);
@@ -64,7 +69,7 @@ unsigned int get_colour(string colour_s)
 void regex_line (string line, int *image)
 {
 
-	regex find_cmd (" (BCKG | LINE_V | LINE_H | RECT): ");
+	/*regex find_cmd (" (BCKG | LINE_V | LINE_H | RECT): ");
 	smatch find_match;
 
 	if(regex_search (line, find_match ,find_cmd)){
@@ -76,7 +81,7 @@ void regex_line (string line, int *image)
 			if(regex_search(line,find_match,find_colour)){
 
 				cout<<"Colour: "<<find_match[1]<<endl;
-				colour_bckg(get_colour(find_match[1]), image)
+				colour_bckg(get_colour(find_match[1]), image);
 			
 			}
 
@@ -85,6 +90,7 @@ void regex_line (string line, int *image)
 		if(find_match[1]== "LINE_V"){
 			
 			regex vertical_line("(\\d+), (\\d+), (\\d+);(BLACK | RED | GREEN | BLUE | YELLOW) ");
+			//regex vertical_line("([0-9]+), ([0-9]+), ([0-9]+);(BLACK | RED | GREEN | BLUE | YELLOW) ");
 
 			if(regex_search(line, find_match, vertical_line)){
 
@@ -135,63 +141,63 @@ colour_rect(get_colour(find_match[5]), image, stoi (find_match[1]), stoi (find_m
 		cout<<"ERROR, no matches found "<<endl;
 	
 	}
-
+*/
 }
+
+
 //funkcija za bojenje pozadine
 void colour_bckg(int colour, int *img)
 {
-	for(x=0; x<DISPLAY_X; x++){
+	/*for(x=0; x<DISPLAY_X; x++){
 
 		for(y=0; y<DISPLAY_Y; y++){
 		
 			img[x*DISPLAY_Y +y]= colour;
 		}
-	}
+	}*/
 
 }
 //funkcija za bojenje vertikalne linije
 void colour_vertical(int colour, int *img, int x, int y1, int y2)
 {
-	
+	/*
 		for(y=y1; y<y2; y++){
 		
 			img[x*DISPLAY_Y +y]= colour;
 		}
-
+*/
 }
 //funkcija za bojenje horizontalne linije
 void colour_horizontal(int colour, int *img, int y, int x1, int x2)
 {
-	
+	/*
 		for(x=x1; x<x2; x++){
 		
 			img[x*DISPLAY_Y +y]= colour;
 		}
-
+*/
 }
 
 //funkcija za bojenje kvadrata
 void colour_rect(int colour, int *img, int x1, int x2, int y1, int y2)
 {
-	for(x=x1; x<x2; x++){
+	/*for(x=x1; x<x2; x++){
 
 		for(y=y1; y<y2; y++){
 		
 			img[x*DISPLAY_Y +y]= colour;
 		}
 	}
-
+*/
 }
 
 
 int main(int argc, char *argv[])
 {
 	FILE *infile; 
-	char *my_line; 
-	size_t my_line_bytes; 
 
 	if (argc < 2) {
-		cout << "Please enter config file path\n";
+		cout << "Please enter the command file "<<endl;
 		return -1;
 	} else {
 		infile = fopen (argv[1], "r"); 
@@ -199,38 +205,40 @@ int main(int argc, char *argv[])
 
 	if (infile == NULL)
 	{
-		printf("Failed to open\n");
+		cout<<"Failed to open file "<<endl;;
 		exit(1);
 	}
 
+
+
 	int *image;
 	int fd;
+	char *my_line;
+	size_t my_line_bytes;	
+
 
 	fd = open("/dev/vga_dma", O_RDWR | O_NDELAY);
 	if (fd < 0)
 	{
-		cout << "Cannot open /dev/vga_dma for write \n";
+		cout << "error closing /dev/vga_dma for write "<<endl;
 		return -1;
 	}
-	else
+	else{
 		image = (int *)mmap(0, MAX_PKT_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-
-
-
+	}
 
 	while( getline(&my_line , &my_line_bytes, infile) >= 0 )
 	{
 		regex_line(my_line, image);
 	}
 
-	fclose(infile); //Zatvaranje text fajla
-	munmap(image, MAX_MMAP_SIZE);
+	fclose(infile); 
+	munmap(image, MAX_PKT_SIZE);
 	close(fd);
 	if (fd < 0){
-		cout << "Cannot close /dev/vga_dma \n";
+		cout << "error closing /dev/vga_dma "<<endl;
 		return -1;
 	}
-	delete [] image;
 
 }
 
