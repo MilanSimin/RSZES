@@ -27,7 +27,7 @@
 using namespace std;
 
 //funkcija za dobijanje boja
-unsigned int get_colour(string colour_s)
+/*unsigned int get_colour(string colour_s)
 {
 	if (colour_s=="BLACK")
 		return BLACK;
@@ -39,7 +39,7 @@ unsigned int get_colour(string colour_s)
 		return BLUE;
 
 	return BLACK;
-}
+}*/
 
 //funkcija za bojenje pozadine
 void colour_bckg(int colour, int *img)
@@ -149,7 +149,7 @@ string sock_read(int sockfd) {
 	return message;
 }
 
-void clear_section(int* img, int clinum) {//oboji u crno odnosno izbrise kvadrat,bitne su granice
+void clear_section(int *img, int clinum) {
 	if (clinum == 0) {
 		colour_rect(BLACK, img, 0, DISPLAY_X / 2 - 1, 0, DISPLAY_Y / 2 - 1);
 	} else if (clinum == 1) {
@@ -161,7 +161,7 @@ void clear_section(int* img, int clinum) {//oboji u crno odnosno izbrise kvadrat
 	}
 }
 
-void draw_rect(int *img, int clinum, int x_off, int y_off) { //iscrtavanje prav. u odnosu na offset u odr. kvadrantu
+void draw_rect(int *img, int clinum, int x_off, int y_off) { 
 	if (clinum == 0) {
 		colour_rect(RED, img, DISPLAY_X / 4 - 20 + x_off, DISPLAY_X / 4 + 20 + x_off,
 			DISPLAY_Y / 4 - 20 + y_off, DISPLAY_Y / 4 + 20 + y_off);
@@ -180,7 +180,6 @@ void draw_rect(int *img, int clinum, int x_off, int y_off) { //iscrtavanje prav.
 
 
 void saturate_section(int *x_off, int *y_off) { 
-//ogranicavanje kvadranta za pomeranje prav.a to su poz relativno u odnosu na sredinu kvadranta
 
 	if (*x_off < -DISPLAY_X / 4 + 21) 
 		*x_off = -DISPLAY_X / 4 + 21;
@@ -230,7 +229,6 @@ int main(){
 		exit(EXIT_FAILURE);
 	}
 	else
-
 		buffer = (int *)mmap(0, MAX_PKT_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
 	//definisanje socketa i potrebnih promenljivih
@@ -258,8 +256,8 @@ int main(){
 	/* Inicijalizacija strukture socket-a */    
 	bzero((char *) &serv_addr, sizeof(serv_addr));     
 	portno = 5001;     
-	serv_addr.sin_family = AF_INET; 
-	//mora biti AF_INET    
+	serv_addr.sin_family = AF_INET; //mora biti AF_INET    
+
 	/* ip adresa host-a. INADDR_ANY vraca ip adresu masine na kojoj se startovao server */    
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	/* broj porta-ne sme se staviti kao broj vec se mora konvertovati u tzv. network byte order funkcijom htons*/  
@@ -272,7 +270,7 @@ int main(){
 		exit(1);     
 	}
 	
-	printf("Server started.. waiting for clients ...\n");
+	cout<<"Server started.. waiting for clients ...\n"<<endl;
 
 	listen(sockfd,4); //maksimalno 4 klijenata moze da koristi     
 	clilen = sizeof(cli_addr);
@@ -285,9 +283,10 @@ int main(){
 			fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
 			newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);//blokira program i ceka klijenta
 			
+			cout<<"Client connected... "<<endl;
 			if (newsockfd < 0)  
 			{        
-				if (errno == EWOULDBLOCK) {//ovo skontati sta tacno radi?
+				if (errno == EWOULDBLOCK) {
 					usleep(15000);//sleep 15ms
 				} else {    
 					perror("ERROR on accept"); 
@@ -311,9 +310,6 @@ int main(){
 					exit(1);
 				}
 
-				/* Child process serves the client
-				Child process is terminating after if block
-				*/
 				if (pid == 0) {
 					int x_off = 0;
 					int y_off = 0;
@@ -321,12 +317,12 @@ int main(){
 					draw_rect(buffer, first_free, 0, 0);
 					close(sockfd);
 					sock_write(newsockfd, "Controlling: " + sec_n_to_str(first_free)); 
-								//da bi vracali string...konkatenacija stringova
+									// da bi vratili string, zato sock_write
 
 					string command;
 
 						do {
-						command = sock_read(newsockfd); //da bi vracali string
+						command = sock_read(newsockfd); //da bi vratili string,  zato sock_read
 						
 						move_rect(buffer, first_free, command, &x_off, &y_off);
 						} while (msg != "q\n" && msg != "");
@@ -336,9 +332,7 @@ int main(){
 
 					exit(0);
 				}
-				/* Parent process add connected client to list
-				Occupy free position in client list 'pids'
-				*/
+				
 				else {
 					close(newsockfd);
 					zauzmi_kvadrant(nizid, pid);
