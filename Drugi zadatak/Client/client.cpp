@@ -14,10 +14,10 @@ int main(int argc, char **argv)
 	int sockfd=0, n=0;
 	char recvBuff[1024];
 	struct sockaddr_in serv_addr;
-	char message [100];
-	int number;
-	char tmpstr [30];
-	int received; 
+	//char message [100];
+	//int number;
+	//char tmpstr [30];
+	//int received; 
 	char ans;
 	/* klijentska aplikacija se poziva sa ./ime_aplikacija ip_adresa_servera */
 	/* kreiraj socket za komunikaciju sa serverom */

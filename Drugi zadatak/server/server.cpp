@@ -216,9 +216,9 @@ int main(){
 	//povezivanje sa VGA kao u proslom domacem
 	int *buffer;
 	int fd;
-	int klijent = 0;
+	//int klijent = 0;
 	int nizid[4]={0}; 
-	int id;
+	//int id;
 	int pid;
 
 	fd = open("/dev/vga_dma", O_RDWR | O_NDELAY);
@@ -250,8 +250,8 @@ int main(){
 
 	//bojenje pozadine i pravljenje cetiri kvadranta
 	colour_bckg(BLACK,buffer);
-	colour_horizontal(BLUE, buffer, 319, 0,479);
-	colour_vertical(BLUE, buffer, 239, 0, 639);
+	colour_horizontal(BLUE, buffer, 239, 0,639); //!!!
+	colour_vertical(BLUE, buffer, 319, 0, 479);  //!!!
 
 	/* Inicijalizacija strukture socket-a */    
 	bzero((char *) &serv_addr, sizeof(serv_addr));     
@@ -281,7 +281,7 @@ int main(){
         	{
 			int flags = fcntl(sockfd, F_GETFL, 0);	
 			fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-			newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);//blokira program i ceka klijenta
+			newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, (socklen_t *)&clilen);//blokira program i ceka klijenta
 			
 			cout<<"Client connected... "<<endl;
 			if (newsockfd < 0)  
@@ -325,7 +325,7 @@ int main(){
 						command = sock_read(newsockfd); //da bi vratili string,  zato sock_read
 						
 						move_rect(buffer, first_free, command, &x_off, &y_off);
-						} while (msg != "q\n" && msg != "");
+						} while (command != "q\n" && command != "");
 					
 					clear_section(buffer, first_free);
 					close(newsockfd);
@@ -335,8 +335,8 @@ int main(){
 				
 				else {
 					close(newsockfd);
-					zauzmi_kvadrant(nizid, pid);
-					ispisivanje_liste(nizid, 4);
+					take_section(nizid, pid);
+					print_list(nizid, 4);
 				}
 			
 				
@@ -350,8 +350,8 @@ int main(){
 						int status;
 						if (waitpid(nizid[a], &status, WNOHANG)) {
 							cout << "Client disconnected\n"<<endl;
-							oslobadjanje_kvadranta(nizid, nizid[a]);
-							ispisivanje_liste(nizid, 4);
+							free_section(nizid, nizid[a]);
+							print_list(nizid, 4);
 						}
 					}
 				}
@@ -366,8 +366,9 @@ int main(){
 	close(fd);
 
 	if (fd < 0)
+	{
 		printf("Cannot close vga_buffer\n");
-
-		close(sockfd);
+	}
+	close(sockfd);
 	return 0;
 }
